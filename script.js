@@ -1,7 +1,7 @@
 class Ship {
     #spacesHit = 0;
     constructor(name, length) {
-        this.name = name; // TODO come up with unique auto naming
+        this.name = name;
         this.length = length;
         Ship.allShips.push(this);
     }
@@ -16,6 +16,14 @@ class Ship {
             return false;
         }
         return true;
+    }
+    static createShipSet(playerName) {
+        const carrier = new Ship(`carrier ${playerName}`, 5);
+        const battleship = new Ship(`battleship ${playerName}`, 4);
+        const cruiser = new Ship(`cruiser ${playerName}`, 3);
+        const submarine = new Ship(`submarine ${playerName}`, 3);
+        const destroyer = new Ship(`destroyer ${playerName}`, 2);
+        return [carrier, battleship, cruiser, submarine, destroyer];
     }
     static allShips = [];
     static freeAllShips() {
@@ -55,37 +63,35 @@ class Gameboard {
             // it's a miss
         }
     }
-    createShips() {
-        // TODO
-    }
     placeShip(x, y, orientation, Ship) {
         /* x and y arguments should be starting points,
         i.e the left-most x coordinate and the top-most y coordinate */
         switch (orientation) {
             case "horizontal":
                 if (x + Ship.length > 9) {
-                    throw new Error("Ship falls outside the gameboard");
+                    return false;
                 }
                 for (let i = 0; i < Ship.length; i++) {
                     if (this.#grid[x + i][y].shipName !== null) {
-                        throw new Error("Cannot place ship on another ship");
+                        return false;
                     }
                     this.#grid[x + i][y].shipName = Ship.name;
                 }
                 break;
             case "vertical":
                 if (y + Ship.length > 9) {
-                    throw new Error("Ship falls outside the gameboard");
+                    return false;
                 }
                 for (let i = 0; i < Ship.length; i++) {
                     if (this.#grid[x][y + i].shipName !== null) {
-                        throw new Error("Cannot place ship on another ship");
+                        return false;
                     }
                     this.#grid[x][y + i].shipName = Ship.name;
                 }
                 break;
         }
         this.shipsOnGameboard.push(Ship);
+        return true;
     }
     areAllSunk() {
         if (this.shipsOnGameboard === []) {
@@ -135,7 +141,7 @@ class NPC extends Player {
     constructor(name) {
         super(name);
     }
-    randomizeCoordinates() {
+    automateAttack() {
         let x = Math.floor(Math.random() * 10);
         let y = Math.floor(Math.random() * 10);
         // Choose new ordered pair if current one is already hit
@@ -144,6 +150,19 @@ class NPC extends Player {
             y = Math.floor(Math.random() * 10);
         }
         return { x, y };
+    }
+    automateShipPlacement(shipSet) {
+        for (let ship of shipSet) {
+            let x;
+            let y;
+            let orientation;
+            do {
+                x = Math.floor(Math.random() * 10);
+                y = Math.floor(Math.random() * 10);
+                orientation = Math.random() > 0.5 ? "vertical" : "horizontal";
+            } while (!this.gameboard.placeShip(x, y, orientation, ship));
+        }
+        return true;
     }
 }
 

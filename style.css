@@ -23,16 +23,90 @@ h3 {
     margin: 10px;
 }
 
+.gameboard,
+.axis {
+    display: grid;
+}
+
+.gameboard,
+.x-axis {
+    width: 300px;
+}
+
+.gameboard,
+.y-axis {
+    height: 300px;
+}
+
+.axis > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.x-axis {
+    grid-template-columns: repeat(10, 1fr);
+    margin: auto;
+    margin-top: 5px;
+}
+
+.y-axis {
+    grid-template-rows: repeat(10, 1fr);
+    width: 20px;
+    margin-left: -25px; /* y-axis width + gap */
+}
+
+.axis-container {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
 .gameboard {
     border: 1px solid black;
-    width: 350px;
-    height: 350px;
-    margin: auto;
-    display: grid;
     grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(10, 1fr);
 }
 
 .gb-space {
     border: 1px solid black;
+}
+
+#new-game-container {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+button {
+    padding: 10px;
+    background-color: rgb(82, 79, 255);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.coordinate-form {
+    font-size: 20px;
+    text-align: center;
+    height: 30px;
+    width: 30px;
+    margin: 0 5px;
+}
+
+.place-ship-form {
+    text-align: center;
+}
+
+.instructions {
+    margin-bottom: 5px;
+}
+
+.length {
+    margin: 5px 0;
+    font-size: 18px;
+    font-style: italic;
 }
