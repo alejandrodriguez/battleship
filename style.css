@@ -94,7 +94,6 @@ button {
     text-align: center;
     height: 30px;
     width: 30px;
-    margin: 0 5px;
 }
 
 .place-ship-form {
@@ -109,4 +108,16 @@ button {
     margin: 5px 0;
     font-size: 18px;
     font-style: italic;
+}
+
+.orientation-button {
+    color: white;
+    background-color: rgb(221, 111, 0);
+}
+
+.form-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }

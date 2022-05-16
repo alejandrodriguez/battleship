@@ -21,6 +21,9 @@ class DOMController {
             playerGameboard.append(space);
         }
     }
+    static initializeGame() {
+        // TODO
+    }
     static preventIncorrectChars(e) {
         if (e.which === 8) {
             return;
@@ -40,16 +43,21 @@ class DOMController {
             }
         }
     }
-    static placeCarrier() {
+    static placeShip(shipName, shipLength) {
         const newGameContainer = document.querySelector("#new-game-container");
         const form = document.createElement("form");
         form.classList.add("place-ship-form");
+        const ship = document.createElement("input");
+        ship.type = "hidden";
+        ship.value = `${shipName}`;
         const instructions = document.createElement("h2");
         instructions.classList.add("instructions");
-        instructions.textContent = "Place your carrier!";
+        instructions.textContent = `Place your ${shipName}!`;
         const length = document.createElement("p");
         length.classList.add("length");
-        length.textContent = "Length: 5";
+        length.textContent = `Length: ${shipLength}`;
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("form-wrapper");
         const xInput = document.createElement("input");
         const yInput = document.createElement("input");
         xInput.classList.add("coordinate-form", "x-input");
@@ -64,6 +72,12 @@ class DOMController {
         yInput.addEventListener("keydown", e =>
             DOMController.preventIncorrectChars(e)
         );
+        const orientation = document.createElement("button");
+        orientation.type = "button";
+        orientation.classList.add("orientation-button", "down");
+        orientation.innerHTML = "&darr;";
+        orientation.addEventListener("click", DOMController.changeOrientation);
+        wrapper.append(xInput, yInput, orientation);
         const placeBtn = document.createElement("button");
         placeBtn.type = "submit";
         placeBtn.textContent = "Place";
@@ -71,22 +85,24 @@ class DOMController {
             DOMController.submitShipPlacement(e)
         );
         newGameBtn.remove();
-        form.append(instructions, xInput, yInput, length, placeBtn);
+        form.append(instructions, wrapper, length, placeBtn);
         newGameContainer.append(form);
         // const xValidation = /^[A-Ja-j]$/;
         // const yValidation = /^([1-9]|10)$/;
+        // TODO orientation
+        // TODO starting point description
     }
-    static placeBattleship() {
-        // TODO
-    }
-    static placeCruiser() {
-        // TODO
-    }
-    static placeSubmarine() {
-        // TODO
-    }
-    static placeDestroyer() {
-        // TODO
+    static changeOrientation() {
+        const oBtn = document.querySelector(".orientation-button");
+        if (oBtn.classList.contains("down")) {
+            oBtn.classList.remove("down");
+            oBtn.classList.add("right");
+            oBtn.innerHTML = "&rarr;";
+        } else if (oBtn.classList.contains("right")) {
+            oBtn.classList.remove("right");
+            oBtn.classList.add("down");
+            oBtn.innerHTML = "&darr;";
+        }
     }
     static submitShipPlacement(e) {
         e.preventDefault();
@@ -94,4 +110,6 @@ class DOMController {
 }
 
 document.addEventListener("DOMContentLoaded", DOMController.initializeSpaces);
-newGameBtn.addEventListener("click", DOMController.placeCarrier);
+newGameBtn.addEventListener("click", () =>
+    DOMController.placeShip("carrier", 5)
+);
