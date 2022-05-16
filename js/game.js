@@ -138,7 +138,19 @@ class Player {
 }
 
 class NPC extends Player {
-    constructor(name) {
+    constructor() {
+        const NPCNames = [
+            "H.A.L.",
+            "JARVIS",
+            "R2-D2",
+            "Optimus Prime",
+            "The Terminator",
+            "WALL-E",
+            "Bender",
+            "Cortana",
+            "GLaDOS"
+        ];
+        const name = NPCNames[Math.floor(Math.random() * 10)];
         super(name);
     }
     automateAttack() {

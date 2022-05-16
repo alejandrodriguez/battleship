@@ -1,7 +1,3 @@
-import { Ship, Gameboard, Player, NPC } from "./script.js";
-
-const newGameBtn = document.querySelector("#new-game-btn");
-
 class DOMController {
     static initializeSpaces() {
         const NPCGameboard = document.querySelector("#npc-gb");
@@ -20,9 +16,6 @@ class DOMController {
             space.dataset.y = 10 - Math.floor((i + 1) / 10);
             playerGameboard.append(space);
         }
-    }
-    static initializeGame() {
-        // TODO
     }
     static preventIncorrectChars(e) {
         if (e.which === 8) {
@@ -110,6 +103,9 @@ class DOMController {
 }
 
 document.addEventListener("DOMContentLoaded", DOMController.initializeSpaces);
+const newGameBtn = document.querySelector("#new-game-btn");
 newGameBtn.addEventListener("click", () =>
     DOMController.placeShip("carrier", 5)
 );
+
+export { DOMController };
