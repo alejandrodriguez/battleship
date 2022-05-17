@@ -1,4 +1,4 @@
-import { Ship, Gameboard, Player, NPC } from "./script.js";
+import { Ship, Gameboard, Player, NPC } from "./game.js";
 
 test("readSpacesHit correctly returns the number of spaces that have been hit", () => {
     const testShip = new Ship("s2", 2);
@@ -28,21 +28,21 @@ test("isSunk returns false if at least one space is not hit", () => {
 test("placeShip should return false if ship is placed outside of Gameboard", () => {
     const testShip = new Ship("s4", 4);
     const testBoard = new Gameboard();
-    expect(testBoard.placeShip(9, 3, "horizontal", testShip)).toBe(false);
+    expect(testBoard.placeShip(9, 3, "down", testShip)).toBe(false);
 });
 
 test("placeShip should return false if a ship is placed on another ship", () => {
     const testShip = new Ship("s4", 4);
     const testShip2 = new Ship("s6", 6);
     const testBoard = new Gameboard();
-    testBoard.placeShip(3, 4, "horizontal", testShip);
-    expect(testBoard.placeShip(4, 2, "vertical", testShip2)).toBe(false);
+    testBoard.placeShip(3, 4, "down", testShip);
+    expect(testBoard.placeShip(4, 2, "down", testShip2)).toBe(false);
 });
 
 test("placeShip should return true if ship is placed within Gameboard and not on another ship", () => {
     const testShip = new Ship("s4", 4);
     const testBoard = new Gameboard();
-    expect(testBoard.placeShip(3, 3, "horizontal", testShip)).toBe(true);
+    expect(testBoard.placeShip(3, 3, "down", testShip)).toBe(true);
 });
 
 test("Ship.allShips should return all instances of Ship", () => {
@@ -57,7 +57,7 @@ test("Ship.allShips should return all instances of Ship", () => {
 test("receiveAttack should send the attack to the hit ship", () => {
     const testShip = new Ship("s2", 2);
     const testBoard = new Gameboard();
-    testBoard.placeShip(2, 3, "horizontal", testShip);
+    testBoard.placeShip(2, 3, "down", testShip);
     testBoard.receiveAttack(3, 3);
     expect(testShip.readSpacesHit()).toBe(1);
 });
@@ -65,7 +65,7 @@ test("receiveAttack should send the attack to the hit ship", () => {
 test("gameboard should report when all ships are sunk", () => {
     const testShip = new Ship("s2", 2);
     const testBoard = new Gameboard();
-    testBoard.placeShip(2, 3, "horizontal", testShip);
+    testBoard.placeShip(2, 3, "down", testShip);
     testBoard.receiveAttack(2, 3);
     testBoard.receiveAttack(3, 3);
     expect(testBoard.areAllSunk()).toBe(true);

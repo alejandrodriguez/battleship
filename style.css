@@ -121,3 +121,30 @@ button {
     align-items: center;
     gap: 10px;
 }
+
+.name-input {
+    height: 25px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 15px;
+}
+
+.hit-opponent {
+    background-color: red;
+}
+
+.miss-opponent {
+    background-color: yellow;
+}
+
+.hit-player {
+    background-color: red;
+}
+
+.miss-player {
+    background-color: yellow;
+}
+
+.occupied-space {
+    background-color: blue;
+}

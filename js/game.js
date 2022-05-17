@@ -23,7 +23,7 @@ class Ship {
         const cruiser = new Ship(`cruiser ${playerName}`, 3);
         const submarine = new Ship(`submarine ${playerName}`, 3);
         const destroyer = new Ship(`destroyer ${playerName}`, 2);
-        return [carrier, battleship, cruiser, submarine, destroyer];
+        return { carrier, battleship, cruiser, submarine, destroyer };
     }
     static allShips = [];
     static freeAllShips() {
@@ -63,34 +63,34 @@ class Gameboard {
             // it's a miss
         }
     }
-    placeShip(x, y, orientation, Ship) {
+    placeShip(x, y, orientation, ship) {
         /* x and y arguments should be starting points,
         i.e the left-most x coordinate and the top-most y coordinate */
         switch (orientation) {
-            case "horizontal":
-                if (x + Ship.length > 9) {
+            case "right":
+                if (x + ship.length > 9) {
                     return false;
                 }
-                for (let i = 0; i < Ship.length; i++) {
+                for (let i = 0; i < ship.length; i++) {
                     if (this.#grid[x + i][y].shipName !== null) {
                         return false;
                     }
-                    this.#grid[x + i][y].shipName = Ship.name;
+                    this.#grid[x + i][y].shipName = ship.name;
                 }
                 break;
-            case "vertical":
-                if (y + Ship.length > 9) {
+            case "down":
+                if (y - ship.length < 0) {
                     return false;
                 }
-                for (let i = 0; i < Ship.length; i++) {
-                    if (this.#grid[x][y + i].shipName !== null) {
+                for (let i = 0; i < ship.length; i++) {
+                    if (this.#grid[x][y - i].shipName !== null) {
                         return false;
                     }
-                    this.#grid[x][y + i].shipName = Ship.name;
+                    this.#grid[x][y - i].shipName = ship.name;
                 }
                 break;
         }
-        this.shipsOnGameboard.push(Ship);
+        this.shipsOnGameboard.push(ship);
         return true;
     }
     areAllSunk() {
@@ -171,7 +171,7 @@ class NPC extends Player {
             do {
                 x = Math.floor(Math.random() * 10);
                 y = Math.floor(Math.random() * 10);
-                orientation = Math.random() > 0.5 ? "vertical" : "horizontal";
+                orientation = Math.random() > 0.5 ? "down" : "right";
             } while (!this.gameboard.placeShip(x, y, orientation, ship));
         }
         return true;
