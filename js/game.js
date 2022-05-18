@@ -68,7 +68,7 @@ class Gameboard {
         i.e the left-most x coordinate and the top-most y coordinate */
         switch (orientation) {
             case "right":
-                if (x + ship.length > 9) {
+                if (x + ship.length - 1 > 9) {
                     return false;
                 }
                 for (let i = 0; i < ship.length; i++) {
@@ -79,7 +79,7 @@ class Gameboard {
                 }
                 break;
             case "down":
-                if (y - ship.length < 0) {
+                if (y + 1 - ship.length < 0) {
                     return false;
                 }
                 for (let i = 0; i < ship.length; i++) {

@@ -18,9 +18,10 @@ h3 {
     text-align: center;
 }
 
-.gameboard-container {
-    width: 100%;
-    margin: 10px;
+.game-wrapper {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
 }
 
 .gameboard,
@@ -72,7 +73,7 @@ h3 {
     border: 1px solid black;
 }
 
-#new-game-container {
+.form-wrapper {
     margin-top: 20px;
     width: 100%;
     display: flex;
@@ -115,7 +116,7 @@ button {
     background-color: rgb(221, 111, 0);
 }
 
-.form-wrapper {
+.form-flex {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -129,22 +130,23 @@ button {
     font-size: 15px;
 }
 
-.hit-opponent {
-    background-color: red;
+.hit {
+    background-color: red !important;
 }
 
-.miss-opponent {
-    background-color: yellow;
-}
-
-.hit-player {
-    background-color: red;
-}
-
-.miss-player {
-    background-color: yellow;
+.miss {
+    background-color: yellow !important;
 }
 
 .occupied-space {
-    background-color: blue;
+    background-color: rgb(80, 80, 255);
+}
+
+.error {
+    margin: 5px auto;
+    background-color: rgb(255, 95, 95);
+    padding: 20px;
+    text-align: center;
+    color: white;
+    border-radius: 5px;
 }

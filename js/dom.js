@@ -27,9 +27,9 @@ class DOMController {
         }
     }
     static getName() {
-        const newGameContainer = document.querySelector("#new-game-container");
+        const formWrapper = document.querySelector(".form-wrapper");
         const form = document.createElement("form");
-        form.classList.add("form-wrapper");
+        form.classList.add("form-flex");
         const nameInput = document.createElement("input");
         nameInput.classList.add("name-input");
         nameInput.placeholder = "What's your name?";
@@ -41,29 +41,24 @@ class DOMController {
         );
         form.append(nameInput, submitBtn);
         newGameBtn.remove();
-        newGameContainer.append(form);
+        formWrapper.append(form);
     }
-    static preventIncorrectChars(e) {
-        if (e.which === 8) {
-            return;
-        }
-        if (e.target.classList.contains("x-input")) {
-            if (e.which < 65 || e.which > 74) {
-                e.preventDefault();
-            }
-        } else if (e.target.classList.contains("y-input")) {
-            if (
-                (e.target.value.length > 0 && e.which !== 48) ||
-                (e.target.value.length > 0 && parseInt(e.target.value) !== 1)
-            ) {
-                e.preventDefault();
-            } else if (e.which < 48 || e.which > 57) {
-                e.preventDefault();
-            }
-        }
+    static initializeGame(e) {
+        e.preventDefault();
+        computer = new NPC();
+        player = new Player(document.querySelector("input").value);
+        computerGameboard = new Gameboard();
+        playerGameboard = new Gameboard();
+        computer.opponent = player;
+        player.opponent = computer;
+        computer.gameboard = computerGameboard;
+        player.gameboard = playerGameboard;
+        computershipSet = Ship.createShipSet(computer.name);
+        playerShipSet = Ship.createShipSet(player.name);
+        DOMController.getShipPlacement(playerShipSet["carrier"]);
     }
-    static placeShip(ship) {
-        const newGameContainer = document.querySelector("#new-game-container");
+    static getShipPlacement(ship) {
+        const formWrapper = document.querySelector(".form-wrapper");
         const form = document.createElement("form");
         form.classList.add("place-ship-form");
         const shipData = document.createElement("input");
@@ -76,8 +71,8 @@ class DOMController {
         const length = document.createElement("p");
         length.classList.add("length");
         length.textContent = `Length: ${ship.length}`;
-        const wrapper = document.createElement("div");
-        wrapper.classList.add("form-wrapper");
+        const container = document.createElement("div");
+        container.classList.add("form-flex");
         const xInput = document.createElement("input");
         const yInput = document.createElement("input");
         xInput.classList.add("coordinate-form", "x-input");
@@ -100,46 +95,30 @@ class DOMController {
         orientation.value = "down";
         orientation.innerHTML = "&darr;";
         orientation.addEventListener("click", DOMController.changeOrientation);
-        wrapper.append(shipData, xInput, yInput, orientation);
+        container.append(shipData, xInput, yInput, orientation);
         const placeBtn = document.createElement("button");
         placeBtn.type = "submit";
         placeBtn.textContent = "Place";
         placeBtn.addEventListener("click", e =>
             DOMController.submitShipPlacement(e)
         );
-        form.append(instructions, wrapper, length, placeBtn);
-        newGameContainer.append(form);
+        form.append(instructions, container, length, placeBtn);
+        while (formWrapper.lastChild) {
+            formWrapper.removeChild(formWrapper.lastChild);
+        }
+        formWrapper.append(form);
         // const xValidation = /^[A-Ja-j]$/;
         // const yValidation = /^([1-9]|10)$/;
         // TODO starting point description
     }
-    static changeOrientation() {
-        const oBtn = document.querySelector(".orientation-button");
-        if (oBtn.value === "down") {
-            oBtn.value = "right";
-            oBtn.innerHTML = "&rarr;";
-        } else if (oBtn.value === "right") {
-            oBtn.value = "down";
-            oBtn.innerHTML = "&darr;";
-        }
-    }
-    static initializeGame(e) {
-        e.preventDefault();
-        computer = new NPC();
-        player = new Player(document.querySelector("input").value);
-        computerGameboard = new Gameboard();
-        playerGameboard = new Gameboard();
-        computer.opponent = player;
-        player.opponent = computer;
-        computer.gameboard = computerGameboard;
-        player.gameboard = playerGameboard;
-        document.querySelector(".form-wrapper").remove();
-        computershipSet = Ship.createShipSet(computer.name);
-        playerShipSet = Ship.createShipSet(player.name);
-        DOMController.placeShip(playerShipSet["carrier"]);
-    }
     static submitShipPlacement(e) {
         e.preventDefault();
+        if (
+            document.querySelector(".x-input").value === "" ||
+            document.querySelector(".y-input").value === ""
+        ) {
+            return;
+        }
         // Convert alphabetic character to valid coordinate
         let x =
             document
@@ -149,13 +128,36 @@ class DOMController {
         const y = parseInt(document.querySelector(".y-input").value) - 1;
         const orientation = document.querySelector(".orientation-button").value;
         const ship = playerShipSet[document.querySelector("#ship-data").value];
-        // TODO reject if false
         if (player.gameboard.placeShip(x, y, orientation, ship)) {
             DOMController.updateGameboardUI();
+            console.log(ship);
+            switch (ship.name.split(" ")[0]) {
+                case "carrier":
+                    DOMController.getShipPlacement(playerShipSet["battleship"]);
+                    break;
+                case "battleship":
+                    DOMController.getShipPlacement(playerShipSet["cruiser"]);
+                    break;
+                case "cruiser":
+                    DOMController.getShipPlacement(playerShipSet["submarine"]);
+                    break;
+                case "submarine":
+                    DOMController.getShipPlacement(playerShipSet["destroyer"]);
+                    break;
+                case "destroyer":
+                    break;
+            }
+        } else {
+            const errorMessage = document.createElement("div");
+            errorMessage.textContent = "Invalid coordinates";
+            errorMessage.classList.add("error");
+            document.body.append(errorMessage);
+            setTimeout(() => errorMessage.remove(), 3000);
         }
     }
+    static getAttack() {}
+    static submitAttack() {}
     static updateGameboardUI() {
-        // ! Bug where class names no longer relevant are not removed
         const computerGrid = computer.gameboard.readGrid();
         computerGrid.forEach((row, x) => {
             row.forEach((space, y) => {
@@ -164,9 +166,9 @@ class DOMController {
                         `.computer-space[data-x="${x}"][data-y="${y}"]`
                     );
                     if (space.shipName !== null) {
-                        spaceUI.classList.add("hit-opponent");
+                        spaceUI.classList.add("hit");
                     } else {
-                        spaceUI.classList.add("miss-opponent");
+                        spaceUI.classList.add("miss");
                     }
                 }
             });
@@ -179,9 +181,9 @@ class DOMController {
                         `.player-space[data-x="${x}"][data-y="${y}"]`
                     );
                     if (space.shipName !== null) {
-                        spaceUI.classList.add("hit-player");
+                        spaceUI.classList.add("hit");
                     } else {
-                        spaceUI.classList.add("miss-player");
+                        spaceUI.classList.add("miss");
                     }
                 } else if (space.shipName !== null) {
                     const spaceUI = document.querySelector(
@@ -191,6 +193,35 @@ class DOMController {
                 }
             });
         });
+    }
+    static changeOrientation() {
+        const oBtn = document.querySelector(".orientation-button");
+        if (oBtn.value === "down") {
+            oBtn.value = "right";
+            oBtn.innerHTML = "&rarr;";
+        } else if (oBtn.value === "right") {
+            oBtn.value = "down";
+            oBtn.innerHTML = "&darr;";
+        }
+    }
+    static preventIncorrectChars(e) {
+        if (e.which === 8) {
+            return;
+        }
+        if (e.target.classList.contains("x-input")) {
+            if (e.which < 65 || e.which > 74) {
+                e.preventDefault();
+            }
+        } else if (e.target.classList.contains("y-input")) {
+            if (
+                (e.target.value.length > 0 && e.which !== 48) ||
+                (e.target.value.length > 0 && parseInt(e.target.value) !== 1)
+            ) {
+                e.preventDefault();
+            } else if (e.which < 48 || e.which > 57) {
+                e.preventDefault();
+            }
+        }
     }
 }
 
