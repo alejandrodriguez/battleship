@@ -237,6 +237,9 @@ class DOMController {
                         `You sunk their ${hitShip}!`,
                         "computer"
                     );
+                    if (computer.gameboard.areAllSunk()) {
+                        DOMController.endGame("player");
+                    }
                 } else {
                     DOMController.updateGameboardUI("Hit!", "computer");
                 }
@@ -304,11 +307,11 @@ class DOMController {
         attackBtn.disabled = true;
         const { x, y } = computer.automateAttack();
         const hitOrMiss = computer.opponent.gameboard.receiveAttack(x, y);
-        const computerName = document.querySelector("#computer-name");
-        computerName.textContent += " is thinking...";
+        const instructions = document.querySelector(".instructions");
+        instructions.textContent = `${computer.name} is thinking...`;
         const randomTime = Math.floor(Math.random() * 4000 + 1000);
         setTimeout(() => {
-            computerName.textContent = computer.name;
+            instructions.textContent = "Attack your enemy!";
             switch (hitOrMiss) {
                 case "hit":
                     const hitShip = computer.opponent.gameboard
@@ -319,6 +322,9 @@ class DOMController {
                             `They sunk your ${hitShip}!`,
                             "player"
                         );
+                        if (player.gameboard.areAllSunk()) {
+                            DOMController.endGame("computer");
+                        }
                     } else {
                         DOMController.updateGameboardUI("Hit!", "player");
                     }
@@ -373,6 +379,23 @@ class DOMController {
                 e.preventDefault();
             }
         }
+    }
+    static endGame(winner) {
+        document.querySelector(".form-wrapper").remove();
+        const winMessage = document.createElement("h1");
+        switch (winner) {
+            case "player":
+                if (player.name) {
+                    winMessage.textContent = `${player.name} wins!`;
+                } else {
+                    winMessage.textContent = "You win!";
+                }
+                break;
+            case "computer":
+                winMessage.textContent = `${computer.name} wins :(`;
+                break;
+        }
+        document.body.append(winMessage);
     }
 }
 
