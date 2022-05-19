@@ -47,20 +47,18 @@ class Gameboard {
     receiveAttack(x, y) {
         const attackedSpace = this.#grid[x][y];
         if (attackedSpace.isHit) {
-            return;
+            return false;
         }
         attackedSpace.isHit = true;
         if (attackedSpace.shipName !== null) {
             for (let ship of Ship.allShips) {
                 if (ship.name === attackedSpace.shipName) {
                     ship.hit();
-                    if (ship.isSunk()) {
-                        this.areAllSunk();
-                    }
+                    return "hit";
                 }
             }
         } else {
-            // it's a miss
+            return "miss";
         }
     }
     placeShip(x, y, orientation, ship) {
@@ -150,7 +148,7 @@ class NPC extends Player {
             "Cortana",
             "GLaDOS"
         ];
-        const name = NPCNames[Math.floor(Math.random() * 10)];
+        const name = NPCNames[Math.floor(Math.random() * NPCNames.length)];
         super(name);
     }
     automateAttack() {
@@ -164,7 +162,7 @@ class NPC extends Player {
         return { x, y };
     }
     automateShipPlacement(shipSet) {
-        for (let ship of shipSet) {
+        for (let ship in shipSet) {
             let x;
             let y;
             let orientation;
@@ -172,7 +170,9 @@ class NPC extends Player {
                 x = Math.floor(Math.random() * 10);
                 y = Math.floor(Math.random() * 10);
                 orientation = Math.random() > 0.5 ? "down" : "right";
-            } while (!this.gameboard.placeShip(x, y, orientation, ship));
+            } while (
+                !this.gameboard.placeShip(x, y, orientation, shipSet[ship])
+            );
         }
         return true;
     }

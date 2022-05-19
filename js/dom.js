@@ -4,7 +4,7 @@ let computer;
 let player;
 let computerGameboard;
 let playerGameboard;
-let computershipSet;
+let computerShipSet;
 let playerShipSet;
 
 class DOMController {
@@ -53,14 +53,21 @@ class DOMController {
         player.opponent = computer;
         computer.gameboard = computerGameboard;
         player.gameboard = playerGameboard;
-        computershipSet = Ship.createShipSet(computer.name);
+        computerShipSet = Ship.createShipSet(computer.name);
         playerShipSet = Ship.createShipSet(player.name);
+        computer.automateShipPlacement(computerShipSet);
+        document.querySelector("#player-name").textContent = player.name
+            ? player.name
+            : "Player";
+        document.querySelector("#computer-name").textContent = computer.name
+            ? computer.name
+            : "CPU";
         DOMController.getShipPlacement(playerShipSet["carrier"]);
     }
     static getShipPlacement(ship) {
         const formWrapper = document.querySelector(".form-wrapper");
         const form = document.createElement("form");
-        form.classList.add("place-ship-form");
+        // form.classList.add("place-ship-form");
         const shipData = document.createElement("input");
         shipData.id = "ship-data";
         shipData.type = "hidden";
@@ -120,7 +127,7 @@ class DOMController {
             return;
         }
         // Convert alphabetic character to valid coordinate
-        let x =
+        const x =
             document
                 .querySelector(".x-input")
                 .value.toLowerCase()
@@ -130,7 +137,6 @@ class DOMController {
         const ship = playerShipSet[document.querySelector("#ship-data").value];
         if (player.gameboard.placeShip(x, y, orientation, ship)) {
             DOMController.updateGameboardUI();
-            console.log(ship);
             switch (ship.name.split(" ")[0]) {
                 case "carrier":
                     DOMController.getShipPlacement(playerShipSet["battleship"]);
@@ -145,6 +151,7 @@ class DOMController {
                     DOMController.getShipPlacement(playerShipSet["destroyer"]);
                     break;
                 case "destroyer":
+                    DOMController.getAttack();
                     break;
             }
         } else {
@@ -155,12 +162,90 @@ class DOMController {
             setTimeout(() => errorMessage.remove(), 3000);
         }
     }
-    static getAttack() {}
-    static submitAttack() {}
-    static updateGameboardUI() {
+    static getAttack() {
+        const formWrapper = document.querySelector(".form-wrapper");
+        const form = document.createElement("form");
+        const instructions = document.createElement("h2");
+        instructions.classList.add("instructions");
+        instructions.textContent = "Attack your enemy!";
+        const container = document.createElement("div");
+        container.classList.add("form-flex");
+        const xInput = document.createElement("input");
+        const yInput = document.createElement("input");
+        xInput.classList.add("coordinate-form", "x-input");
+        yInput.classList.add("coordinate-form", "y-input");
+        xInput.placeholder = "X";
+        yInput.placeholder = "Y";
+        xInput.maxLength = 1;
+        yInput.maxLength = 2;
+        xInput.required = true;
+        yInput.required = true;
+        xInput.addEventListener("keydown", e =>
+            DOMController.preventIncorrectChars(e)
+        );
+        yInput.addEventListener("keydown", e =>
+            DOMController.preventIncorrectChars(e)
+        );
+        container.append(xInput, yInput);
+        const attackBtn = document.createElement("button");
+        attackBtn.classList.add("attack-btn");
+        attackBtn.type = "submit";
+        attackBtn.textContent = "Fire!";
+        attackBtn.addEventListener("click", e => DOMController.submitAttack(e));
+        form.append(instructions, container, attackBtn);
+        while (formWrapper.lastChild) {
+            formWrapper.removeChild(formWrapper.lastChild);
+        }
+        formWrapper.append(form);
+    }
+    static submitAttack(e) {
+        e.preventDefault();
+        if (
+            document.querySelector(".x-input").value === "" ||
+            document.querySelector(".y-input").value === ""
+        ) {
+            return;
+        }
+        // Convert alphabetic character to valid coordinate
+        const x =
+            document
+                .querySelector(".x-input")
+                .value.toLowerCase()
+                .charCodeAt(0) - 97;
+        const y = parseInt(document.querySelector(".y-input").value) - 1;
+        const hitOrMiss = player.opponent.gameboard.receiveAttack(x, y);
+        switch (hitOrMiss) {
+            case false:
+                const errorMessage = document.createElement("div");
+                errorMessage.textContent = "You have already hit that space!";
+                errorMessage.classList.add("error");
+                document.body.append(errorMessage);
+                setTimeout(() => errorMessage.remove(), 3000);
+                break;
+            case "hit":
+                const hitShip = player.opponent.gameboard
+                    .readGrid()
+                    [x][y].shipName.split(" ")[0];
+                if (computerShipSet[hitShip].isSunk()) {
+                    DOMController.updateGameboardUI(
+                        `You sunk their ${hitShip}!`,
+                        "computer"
+                    );
+                } else {
+                    DOMController.updateGameboardUI("Hit!", "computer");
+                }
+                DOMController.attackPlayer();
+                break;
+            case "miss":
+                DOMController.updateGameboardUI("Miss!", "computer");
+                DOMController.attackPlayer();
+                break;
+        }
+    }
+    static updateGameboardUI(notification = null, displayGB = null) {
         const computerGrid = computer.gameboard.readGrid();
-        computerGrid.forEach((row, x) => {
-            row.forEach((space, y) => {
+        computerGrid.forEach((column, x) => {
+            column.forEach((space, y) => {
                 if (space.isHit) {
                     const spaceUI = document.querySelector(
                         `.computer-space[data-x="${x}"][data-y="${y}"]`
@@ -174,8 +259,8 @@ class DOMController {
             });
         });
         const playerGrid = player.gameboard.readGrid();
-        playerGrid.forEach((row, x) => {
-            row.forEach((space, y) => {
+        playerGrid.forEach((column, x) => {
+            column.forEach((space, y) => {
                 if (space.isHit) {
                     const spaceUI = document.querySelector(
                         `.player-space[data-x="${x}"][data-y="${y}"]`
@@ -193,6 +278,53 @@ class DOMController {
                 }
             });
         });
+        if (notification !== null) {
+            const popUp = document.createElement("div");
+            popUp.classList.add("pop-up");
+            const popUpText = document.createElement("p");
+            popUpText.textContent = notification;
+            const displayGBDiv = document.querySelector(`#${displayGB}-gb`);
+            popUp.append(popUpText);
+            displayGBDiv.append(popUp);
+            setTimeout(() => popUp.remove(), 3000);
+        }
+    }
+    static attackPlayer() {
+        const xInput = document.querySelector(".x-input");
+        const yInput = document.querySelector(".y-input");
+        const attackBtn = document.querySelector(".attack-btn");
+        xInput.disabled = true;
+        yInput.disabled = true;
+        attackBtn.disabled = true;
+        const { x, y } = computer.automateAttack();
+        const hitOrMiss = computer.opponent.gameboard.receiveAttack(x, y);
+        const computerName = document.querySelector("#computer-name");
+        computerName.textContent += " is thinking...";
+        const randomTime = Math.floor(Math.random() * 4000 + 1000);
+        setTimeout(() => {
+            computerName.textContent = computer.name;
+            switch (hitOrMiss) {
+                case "hit":
+                    const hitShip = computer.opponent.gameboard
+                        .readGrid()
+                        [x][y].shipName.split(" ")[0];
+                    if (playerShipSet[hitShip].isSunk()) {
+                        DOMController.updateGameboardUI(
+                            `They sunk your ${hitShip}!`,
+                            "player"
+                        );
+                    } else {
+                        DOMController.updateGameboardUI("Hit!", "player");
+                    }
+                    break;
+                case "miss":
+                    DOMController.updateGameboardUI("Miss!", "player");
+                    break;
+            }
+            xInput.disabled = false;
+            yInput.disabled = false;
+            attackBtn.disabled = false;
+        }, randomTime);
     }
     static changeOrientation() {
         const oBtn = document.querySelector(".orientation-button");
@@ -205,6 +337,7 @@ class DOMController {
         }
     }
     static preventIncorrectChars(e) {
+        // ! Fix implementation to allow for highlighting (letters work) and arrow keys and not to allow 0 as 1st num in y value
         if (e.which === 8) {
             return;
         }
