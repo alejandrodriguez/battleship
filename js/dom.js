@@ -96,6 +96,9 @@ class DOMController {
         yInput.addEventListener("keydown", e =>
             DOMController.preventIncorrectChars(e)
         );
+        yInput.addEventListener("keyup", e =>
+            DOMController.preventIncorrectChars(e)
+        );
         const orientation = document.createElement("button");
         orientation.type = "button";
         orientation.classList.add("orientation-button");
@@ -184,6 +187,9 @@ class DOMController {
             DOMController.preventIncorrectChars(e)
         );
         yInput.addEventListener("keydown", e =>
+            DOMController.preventIncorrectChars(e)
+        );
+        yInput.addEventListener("keyup", e =>
             DOMController.preventIncorrectChars(e)
         );
         container.append(xInput, yInput);
@@ -337,21 +343,33 @@ class DOMController {
         }
     }
     static preventIncorrectChars(e) {
-        // ! Fix implementation to allow for highlighting (letters work) and arrow keys and not to allow 0 as 1st num in y value
-        if (e.which === 8) {
+        // If function is called by keyup, validate that 2nd char in input is always to make value equal to "10"
+        if (e.type === "keyup" && e.target.value.length > 1) {
+            if (e.target.value.length > 2) {
+                e.target.value = "10";
+            } else if (e.target.value !== "10") {
+                e.target.value = e.target.value[0];
+            }
+        }
+        // If key is not alphanumeric, allow it
+        else if (e.key.length !== 1) {
             return;
         }
-        if (e.target.classList.contains("x-input")) {
-            if (e.which < 65 || e.which > 74) {
+        // If key is 0 and it is the first number input prevent default
+        else if (e.key === "0" && e.target.value.length === 0) {
+            e.preventDefault();
+        }
+        // If validating x-input, check to make sure it is equal to a-j
+        else if (e.target.classList.contains("x-input")) {
+            const letterRegEx = /[A-Ja-j]/;
+            if (!letterRegEx.test(e.key)) {
                 e.preventDefault();
             }
-        } else if (e.target.classList.contains("y-input")) {
-            if (
-                (e.target.value.length > 0 && e.which !== 48) ||
-                (e.target.value.length > 0 && parseInt(e.target.value) !== 1)
-            ) {
-                e.preventDefault();
-            } else if (e.which < 48 || e.which > 57) {
+        }
+        // If validating y-input, check to make sure character is numeric
+        else if (e.target.classList.contains("y-input")) {
+            const numberRegEx = /[0-9]/;
+            if (!numberRegEx.test(e.key)) {
                 e.preventDefault();
             }
         }
