@@ -27,6 +27,9 @@ class DOMController {
         }
     }
     static getName() {
+        const music = new Audio("audio/battle-music.mp3");
+        music.play();
+        music.loop = true;
         const formWrapper = document.querySelector(".form-wrapper");
         const form = document.createElement("form");
         form.classList.add("form-flex");
