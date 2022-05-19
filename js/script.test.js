@@ -3,12 +3,14 @@ import { Ship, Gameboard, Player, NPC } from "./game.js";
 test("readSpacesHit correctly returns the number of spaces that have been hit", () => {
     const testShip = new Ship("s2", 2);
     expect(testShip.readSpacesHit()).toBe(0);
+    Ship.freeAllShips();
 });
 
 test("hit function correctly updates spacesHit", () => {
     const testShip = new Ship("s3", 3);
     testShip.hit(0);
     expect(testShip.readSpacesHit()).toBe(1);
+    Ship.freeAllShips();
 });
 
 test("isSunk returns true if all spaces are hit", () => {
@@ -17,18 +19,21 @@ test("isSunk returns true if all spaces are hit", () => {
         testShip.hit(i);
     }
     expect(testShip.isSunk()).toBe(true);
+    Ship.freeAllShips();
 });
 
 test("isSunk returns false if at least one space is not hit", () => {
     const testShip = new Ship("s5", 5);
     testShip.hit(2);
     expect(testShip.isSunk()).toBe(false);
+    Ship.freeAllShips();
 });
 
 test("placeShip should return false if ship is placed outside of Gameboard", () => {
     const testShip = new Ship("s4", 4);
     const testBoard = new Gameboard();
-    expect(testBoard.placeShip(9, 3, "down", testShip)).toBe(false);
+    expect(testBoard.placeShip(9, 1, "down", testShip)).toBe(false);
+    Ship.freeAllShips();
 });
 
 test("placeShip should return false if a ship is placed on another ship", () => {
@@ -37,16 +42,17 @@ test("placeShip should return false if a ship is placed on another ship", () => 
     const testBoard = new Gameboard();
     testBoard.placeShip(3, 4, "down", testShip);
     expect(testBoard.placeShip(4, 2, "down", testShip2)).toBe(false);
+    Ship.freeAllShips();
 });
 
 test("placeShip should return true if ship is placed within Gameboard and not on another ship", () => {
     const testShip = new Ship("s4", 4);
     const testBoard = new Gameboard();
     expect(testBoard.placeShip(3, 3, "down", testShip)).toBe(true);
+    Ship.freeAllShips();
 });
 
 test("Ship.allShips should return all instances of Ship", () => {
-    Ship.freeAllShips();
     const testShip = new Ship("s4", 4);
     const testShip2 = new Ship("s6", 6);
     const testShip3 = new Ship("s2", 2);
@@ -57,18 +63,21 @@ test("Ship.allShips should return all instances of Ship", () => {
 test("receiveAttack should send the attack to the hit ship", () => {
     const testShip = new Ship("s2", 2);
     const testBoard = new Gameboard();
-    testBoard.placeShip(2, 3, "down", testShip);
+    testBoard.placeShip(2, 3, "right", testShip);
     testBoard.receiveAttack(3, 3);
     expect(testShip.readSpacesHit()).toBe(1);
+    Ship.freeAllShips();
 });
 
 test("gameboard should report when all ships are sunk", () => {
     const testShip = new Ship("s2", 2);
     const testBoard = new Gameboard();
-    testBoard.placeShip(2, 3, "down", testShip);
+    testBoard.placeShip(2, 3, "right", testShip);
     testBoard.receiveAttack(2, 3);
     testBoard.receiveAttack(3, 3);
+    console.log(testBoard.readGrid());
     expect(testBoard.areAllSunk()).toBe(true);
+    Ship.freeAllShips();
 });
 
 test("NPC.automateAttack() should return an ordered pair that has not already been attacked on opponent's gameboard", () => {
@@ -84,9 +93,10 @@ test("NPC.automateAttack() should return an ordered pair that has not already be
     for (let i = 0; i < 20; i++) {
         expect(testNPC.automateAttack()).not.toBe(1, 5);
     }
+    Ship.freeAllShips();
 });
 
-test("automate ship placement should successfully place all ships randomly", () => {
+test("NPC.automateShipPlacement() should successfully place all ships randomly", () => {
     const testPlayer = new Player("John");
     const playerBoard = new Gameboard();
     testPlayer.gameboard = playerBoard;
@@ -99,4 +109,5 @@ test("automate ship placement should successfully place all ships randomly", () 
         testNPC.automateShipPlacement(Ship.createShipSet(testNPC.name))
     ).toBe(true);
     console.log(testNPC.gameboard.readGrid());
+    Ship.freeAllShips();
 });
