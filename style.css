@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Notable&display=swap");
+
 * {
     margin: 0;
     padding: 0;
@@ -5,23 +7,42 @@
 }
 
 body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-family: "Notable", sans-serif;
+    color: white;
     min-height: 100vh;
     padding: 30px;
+    background-image: linear-gradient(
+            rgba(35, 46, 57, 0.5),
+            rgba(36, 70, 105, 0.5)
+        ),
+        url("./img/background.jpg");
+    background-position: 50%;
 }
 
 h1 {
     text-align: center;
     font-size: 50px;
+    text-shadow: 5px 5px 2px black;
 }
 
 h3 {
     text-align: center;
+    text-shadow: 3px 3px 2px black;
 }
 
 .game-wrapper {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
+}
+
+@media (max-width: 1100px) {
+    .game-wrapper {
+        flex-direction: column;
+    }
 }
 
 .gameboard,
@@ -32,12 +53,12 @@ h3 {
 
 .gameboard,
 .x-axis {
-    width: 300px;
+    width: max(30vw, 250px);
 }
 
 .gameboard,
 .y-axis {
-    height: 300px;
+    height: max(30vw, 250px);
 }
 
 .axis > div {
@@ -65,13 +86,22 @@ h3 {
 }
 
 .gameboard {
-    border: 1px solid black;
+    border: 1px solid white;
     grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(10, 1fr);
+    cursor: crosshair;
 }
 
 .gb-space {
-    border: 1px solid black;
+    border: 1px solid white;
+}
+
+.selectable-space:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.selectable-space:active {
+    background-color: rgba(255, 255, 255, 0.7);
 }
 
 .form-wrapper {
@@ -83,6 +113,23 @@ h3 {
 }
 
 button {
+    font-family: inherit;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    outline: none;
+    border-radius: 20px;
+    cursor: pointer;
+    background-color: rgb(255, 255, 255);
+    color: steelblue;
+}
+
+button:hover {
+    color: black;
+}
+
+.btn {
+    font-family: inherit;
     padding: 10px;
     background-color: rgb(82, 79, 255);
     color: white;
@@ -91,19 +138,17 @@ button {
     cursor: pointer;
 }
 
-.coordinate-form {
-    font-size: 20px;
-    text-align: center;
-    height: 30px;
-    width: 30px;
-}
-
 form {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
 }
 
 .instructions {
     margin-bottom: 5px;
+    text-shadow: 3px 3px 2px black;
 }
 
 .length {
@@ -113,27 +158,23 @@ form {
 }
 
 .orientation-button {
+    font-size: 18px;
     color: white;
     background-color: rgb(221, 111, 0);
 }
 
-.form-flex {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin: 5px 0;
-}
-
 .name-input {
-    height: 25px;
+    height: 40px;
+    font-family: inherit;
     border-radius: 5px;
     text-align: center;
-    font-size: 15px;
+    font-size: 16px;
+    outline: none;
+    border: none;
 }
 
 .hit {
-    background-color: red !important;
+    background-color: #dc3545 !important;
 }
 
 .miss {
@@ -146,16 +187,15 @@ form {
 
 .error {
     margin: 5px auto;
-    background-color: rgb(255, 95, 95);
+    background-color: #dc3545;
     padding: 20px;
     text-align: center;
     color: white;
     border-radius: 5px;
-}
-
-.attack-btn {
-    background-color: rgb(255, 90, 90);
-    font-weight: bold;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .pop-up {
@@ -163,7 +203,10 @@ form {
     justify-content: center;
     align-items: center;
     position: absolute;
-    font-size: 50px;
+    font-size: 40px;
+    color: white;
+    text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000,
+        2px 2px 0 #000;
     top: 0%;
     left: 0%;
     width: 100%;
@@ -171,4 +214,12 @@ form {
     font-weight: bold;
     background-color: rgba(255, 255, 255, 0.5);
     text-align: center;
+}
+
+.preview-space-valid {
+    background-color: #28a745 !important;
+}
+
+.preview-space-invalid {
+    background-color: #dc3545 !important;
 }

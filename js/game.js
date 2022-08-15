@@ -73,6 +73,8 @@ class Gameboard {
                     if (this.#grid[x + i][y].shipName !== null) {
                         return false;
                     }
+                }
+                for (let i = 0; i < ship.length; i++) {
                     this.#grid[x + i][y].shipName = ship.name;
                 }
                 break;
@@ -84,6 +86,8 @@ class Gameboard {
                     if (this.#grid[x][y - i].shipName !== null) {
                         return false;
                     }
+                }
+                for (let i = 0; i < ship.length; i++) {
                     this.#grid[x][y - i].shipName = ship.name;
                 }
                 break;
