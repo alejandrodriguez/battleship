@@ -26,6 +26,7 @@ h1 {
     text-align: center;
     font-size: 50px;
     text-shadow: 5px 5px 2px black;
+    margin-bottom: 20px;
 }
 
 h3 {
@@ -37,12 +38,6 @@ h3 {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-}
-
-@media (max-width: 1100px) {
-    .game-wrapper {
-        flex-direction: column;
-    }
 }
 
 .gameboard,
@@ -149,6 +144,7 @@ form {
 .instructions {
     margin-bottom: 5px;
     text-shadow: 3px 3px 2px black;
+    text-align: center;
 }
 
 .length {
@@ -223,3 +219,22 @@ form {
 .preview-space-invalid {
     background-color: #dc3545 !important;
 }
+
+@media (min-width: 2000px) {
+    body {
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+}
+
+@media (max-width: 1100px) {
+    .game-wrapper {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 600px) {
+    h1 {
+        font-size: 28px;
+    }
+} ;
